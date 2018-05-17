@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Eth To-Do</title>
+    <script src="https://unpkg.com/vue"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"
+          integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-light">
+<div id="app" class="container">
+    <div class="py-5 text-center">
+        <h1>Eth To-Do</h1>
+        <p>Another Blockchain ToDo App</p>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div class="form-group">
+                <input type="text" class="form-control pb-3" id="todo" v-model="newTodo"
+                       placeholder="What needs to be done">
+            </div>
+            <button @click="add" type="button" class="btn btn-primary btn-lg btn-block">Add</button>
+        </div>
+    </div>
+    <div id="mytasks">
+        <div class="py-5 text-center col-12">
+            <h2>My Tasks</h2>
+            <br>
+            <todo v-for="task in tasks" :text="task">{{task}}</todo>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    const ToDo = Vue.component('todo', {
+        props: ["text"],
+        data() {
+            return {
+                isDone: false
+            }
+        },
+        methods: {
+            complete() {
+                this.isDone = true
+            },
+            undo() {
+                this.isDone = false
+            }
+        },
+        template: `
+            <div :class="{done : isDone}">
+                    <div class="input-group my-2">
+                        <input type="text" class="form-control" placeholder="ToDo" aria-label="ToDo" v-model="text" readonly>
+                        <div class="input-group-append">
+                        <button v-if="isDone" type="button" @click="undo" class="btn btn-light">Undo</button>
+                        <button v-else type="button" @click="complete" class="btn btn-dark">Done</button>
+                        </div>
+                     </div>
+            </div>
+        `
+    });
+
+    const app = new Vue({
+        el: '#app',
+        components: {
+            ToDo
+        },
+        data: {
+            newTodo: undefined,
+            tasks: ["test app"]
+        },
+        methods: {
+            add: function () {
+                this.tasks.push(this.newTodo)
+            }
+        }
+    });
+
+</script>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+        integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"
+        integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T"
+        crossorigin="anonymous"></script>
+</body>
+</html>

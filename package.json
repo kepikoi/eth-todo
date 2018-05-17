@@ -1,0 +1,21 @@
+{
+  "name": "eth-todo",
+  "version": "0.0.0",
+  "description": "Another Blockchain ToDo App",
+  "main": "index.js",
+  "dependencies": {
+    "http-server": "^0.11.1",
+    "live-server": "^1.2.0"
+  },
+  "devDependencies": {
+    "node-sass": "^4.9.0"
+  },
+  "scripts": {
+    "build": "node build.js",
+    "start": "http-server ./public -o -c0",
+    "dev": "node dev-server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}

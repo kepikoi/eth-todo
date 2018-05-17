@@ -1,0 +1,19 @@
+#mytasks {
+  .form-control[readonly] {
+    background-color: #f8f9fa;
+  }
+
+  input {
+    border: 0 !important;
+    border-bottom: 1px solid !important;
+    border-radius: 0 !important;
+  }
+
+  .done {
+    text-decoration: line-through;
+  }
+
+  .done input {
+    border: 0 !important;
+  }
+}
