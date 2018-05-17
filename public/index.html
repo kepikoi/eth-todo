@@ -9,75 +9,51 @@
 </head>
 <body class="bg-light">
 <div id="app" class="container">
+    <div v-if="user" class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>Login successfull</strong> Logged in as {{user}}
+
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+
+    <div v-if="error">
+        <div class="alert alert-danger" role="alert">
+            {{error.message}}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    </div>
+
     <div class="py-5 text-center">
-        <h1>Eth To-Do</h1>
-        <p>Another Blockchain ToDo App</p>
+        <h1> Eth To-Do</h1>
+        <p>Blockchain-based ToDo app</p>
     </div>
-    <div class="row">
-        <div class="col-12">
-            <div class="form-group">
-                <input type="text" class="form-control pb-3" id="todo" v-model="newTodo"
-                       placeholder="What needs to be done">
+    <div v-if="user">
+        <div class="row">
+            <div class="col-12">
+                <div class="form-group">
+                    <input type="text" class="form-control pb-3" id="todo" v-model="newTodo"
+                           placeholder="What needs to be done">
+                </div>
+                <button @click="add" :disabled="!newTodo" type="button" class="btn btn-primary btn-lg btn-block">Add</button>
             </div>
-            <button @click="add" type="button" class="btn btn-primary btn-lg btn-block">Add</button>
+        </div>
+        <div id="mytasks">
+            <div class="py-5 text-center col-12">
+                <h2>My Tasks</h2>
+                <br>
+                <todo v-for="task in tasks" :text="task" :key="task.key">{{task}}</todo>
+            </div>
         </div>
     </div>
-    <div id="mytasks">
-        <div class="py-5 text-center col-12">
-            <h2>My Tasks</h2>
-            <br>
-            <todo v-for="task in tasks" :text="task">{{task}}</todo>
+    <div v-else>
+        <div class="alert alert-info" role="alert">
+            Please login to Metamask
         </div>
     </div>
-
 </div>
-
-<script>
-    const ToDo = Vue.component('todo', {
-        props: ["text"],
-        data() {
-            return {
-                isDone: false
-            }
-        },
-        methods: {
-            complete() {
-                this.isDone = true
-            },
-            undo() {
-                this.isDone = false
-            }
-        },
-        template: `
-            <div :class="{done : isDone}">
-                    <div class="input-group my-2">
-                        <input type="text" class="form-control" placeholder="ToDo" aria-label="ToDo" v-model="text" readonly>
-                        <div class="input-group-append">
-                        <button v-if="isDone" type="button" @click="undo" class="btn btn-light">Undo</button>
-                        <button v-else type="button" @click="complete" class="btn btn-dark">Done</button>
-                        </div>
-                     </div>
-            </div>
-        `
-    });
-
-    const app = new Vue({
-        el: '#app',
-        components: {
-            ToDo
-        },
-        data: {
-            newTodo: undefined,
-            tasks: ["test app"]
-        },
-        methods: {
-            add: function () {
-                this.tasks.push(this.newTodo)
-            }
-        }
-    });
-
-</script>
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
         integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
         crossorigin="anonymous"></script>
@@ -87,5 +63,7 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"
         integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T"
         crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/truffle-contract@3.0.5/dist/truffle-contract.min.js"></script>
+<script src="scripts.js"></script>
 </body>
 </html>
