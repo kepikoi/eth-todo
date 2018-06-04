@@ -105,9 +105,9 @@ const
                 .then(() => checkUser()
                     .then(u => this.user = u))
                 .then(() => initContract())
-                .then(() => loadTodos()
-                    .then(todos => this.tasks = todos))
-                .catch(e => this.error = e);
+                .then(() => loadTodos())
+                .catch(e => this.error = e)
+            ;
         }
     });
 
@@ -115,18 +115,13 @@ function loadTodos() {
     return App.contracts.ToDoFactory
         .deployed()
         .then(contract => contract.getMyToDos.call())
-        .then(todos => this.tasks = todos);
+        .then(todos => this.tasks = todos)
+    ;
 }
 
 function checkUser() {
-    return new Promise((resolve, reject) => {
-        window.web3.eth.getAccounts(function (error, accounts) {
-            if (error) {
-                return reject(error);
-            }
-            return resolve(accounts[0]);
-        });
-    });
+    return new Promise((resolve, reject) =>  window.web3.eth.accounts[0]
+    );
 }
 
 function initWeb3() {
