@@ -105,9 +105,8 @@ const
                 .then(() => checkUser()
                     .then(u => this.user = u))
                 .then(() => initContract())
-                .then(() => loadTodos())
+                .then(() => loadTodos.bind(this)())
                 .catch(e => this.error = e)
-            ;
         }
     });
 
@@ -115,8 +114,8 @@ function loadTodos() {
     return App.contracts.ToDoFactory
         .deployed()
         .then(contract => contract.getMyToDos.call())
-        .then(todos => this.tasks = todos)
-    ;
+        .then(todos => {this.tasks .push( todos)}
+        );
 }
 
 function checkUser() {
