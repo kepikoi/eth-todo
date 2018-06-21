@@ -18,29 +18,37 @@ contract ToDoFactory {
         _;
     }
 
-    function add(string _text) public {
+    event TaskAdded(uint id);
+    event TaskModified(uint id, bool undo);
+
+    function add(string _text) external {
         uint id = todos.push(ToDo(_text, false)) - 1;
         todoOwner[id] = msg.sender;
         ownerTodoCount[msg.sender]++;
+        emit TaskAdded(id);
     }
 
-    function complete(uint _id, bool _undo) public ownerOf(_id) {
+    function complete(uint _id, bool _undo) external ownerOf(_id) {
+        ToDo storage todo = todos[_id];
         if (_undo == true) {
-            todos[_id].done = false;
+            assert(todo.done == true);
+            todo.done = false;
+            ownerTodoCount[msg.sender]++;
         }
         else {
+            assert(todo.done == false);
             todos[_id].done = true;
             ownerTodoCount[msg.sender]--;
         }
-
+        emit TaskModified(_id, _undo);
     }
 
-    function getById(uint id) public view returns (string){
+    function getById(uint id) external view ownerOf(id) returns (string){
         ToDo memory todo = todos[id];
         return todo.text;
     }
 
-    function getMyToDos() public view returns (uint[]) {
+    function getMyToDos() external view returns (uint[]) {
         uint [] memory out = new uint[](ownerTodoCount[msg.sender]);
         uint count = 0;
         for (uint i = 0; i < todos.length; i++) {

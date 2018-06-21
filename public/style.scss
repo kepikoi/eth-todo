@@ -1,5 +1,8 @@
 @import "~bootstrap/scss/bootstrap";
+
 #mytasks {
+  transition: 2s;
+
   .form-control[readonly] {
     background-color: #f8f9fa;
   }
@@ -12,9 +15,38 @@
 
   .done {
     text-decoration: line-through;
+    input {
+      border: 0 !important;
+    }
   }
 
-  .done input {
-    border: 0 !important;
+  .add-transit input {
+    animation-duration: 2s;
+    animation-name: addtransit;
+    animation-iteration-count: 1;
+  }
+
+  .add-confirm input {
+    animation-duration: 2s;
+    animation-name: addconfirm;
+    animation-iteration-count: 1;
+  }
+}
+
+@-webkit-keyframes addconfirm {
+  0% {
+    color: $green;
+  }
+  100% {
+    color: $gray-700;
+  }
+}
+
+@-webkit-keyframes addtransit {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 100;
   }
 }

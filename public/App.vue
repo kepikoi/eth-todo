@@ -33,7 +33,9 @@
                 <div class="py-5 text-center col-12">
                     <h2>My Tasks</h2>
                     <br>
-                    <todo v-for="task in tasks" :text="task" :key="task.key">{{task}}</todo>
+                    <todo v-for="task in tasks" :text="task.todo" :id="task.id" :tx="task.tx" v-on:error="onerror"></todo>
+                    <spinner v-if="isLoadingTasks"></spinner>
+                    <div v-if="tasks.length === 0 && !isLoadingTasks">🤘🏻 All done!</div>
                 </div>
             </div>
         </div>
@@ -45,25 +47,27 @@
     </div>
 </template>
 <script>
-    import todo from "./ToDo";
-    import contract from "../build/contracts/ToDoFactory.json";
-
-    window.Dapp = {
-        contracts: {},
-        web3Provider: undefined
-    };
+    import todo from "./components/ToDo";
+    import Vue from "vue";
+    import spinner from "./components/Spinner";
 
     export default {
         name: "app",
         components: {
-            todo
+            todo,
+            spinner
         },
         data() {
             return {
                 error: undefined,
                 newTodo: undefined,
                 tasks: [],
-                user: undefined
+                isLoadingTasks: true
+            }
+        },
+        computed: {
+            user() {
+                return Vue.getUser()
             }
         },
         watch: {
@@ -73,71 +77,41 @@
         },
         methods: {
             add() {
-                window.Dapp.contracts.ToDoFactory
+                Vue
                     .deployed()
-                    .then(contract => contract.add((this.newTodo), {from: this.user}))
-                    .then(id => {
-                        this.tasks.push(this.newTodo);
+                    .then(contract => contract.add(this.newTodo))
+                    .then(receipt => {
+                        this.tasks.push({todo: this.newTodo, tx: receipt.tx});
                         this.newTodo = undefined;
                     })
                     .catch(e => this.error = e);
+            },
+            onerror(e) {
+                this.error = e;
             }
         },
         created() {
-            const initApp = init.bind(this);
-            initApp()
-            window.web3.currentProvider.publicConfigStore.on("update", initApp)//reload tasks on user change
+            console.log("App.vue");
+            return Vue
+                .deployed()
+                .then(contract => contract
+                    .getMyToDos.call()
+                    .then(todos => {
+                            this.isLoadingTasks = false;
+                            todos.map(id => {
+                                    const dId = window.web3.toDecimal(id);
+                                    contract.getById
+                                        .call(dId)
+                                        .then(todo => this.tasks.push({id: dId, todo}))
+                                }
+                            )
+                        }
+                    )
+                );
         }
     };
 
-    function init() {
-        Promise.resolve()
-            .then(() => initWeb3()
-                .then(w => window.web3 = w))
-            .then(() => checkUser()
-                .then(u => this.user = u))
-            .then(() => initContract())
-            .then(() => loadTodos.bind(this)())
-            .catch(e => this.error = e);
-    }
 
-    function loadTodos() {
-        this.tasks = [];
-        return window.Dapp.contracts.ToDoFactory
-            .deployed()
-            .then(contract => contract
-                .getMyToDos.call()
-                .then(todos =>
-                    todos.map(id =>
-                        contract.getById
-                            .call(window.web3.toDecimal(id))
-                            .then(toDo => this.tasks.push(toDo))
-                    )
-                )
-            );
-    }
-
-    function checkUser() {
-        return new Promise((resolve) => {
-            return resolve(window.web3.eth.accounts[0]);
-        });
-    }
-
-    function initWeb3() {
-        return new Promise((resolve, reject) => {
-            if (typeof window.web3 !== "undefined") {
-                window.Dapp.web3Provider = window.web3.currentProvider;
-            } else {
-                return reject(new Error("no injected web3 instance is detected"));
-            }
-            return resolve(new Web3(window.Dapp.web3Provider));
-        });
-    }
-
-    function initContract() {
-        window.Dapp.contracts.ToDoFactory = window.TruffleContract(contract);
-        window.Dapp.contracts.ToDoFactory.setProvider(window.Dapp.web3Provider);
-    }
 </script>
 <style scoped>
 </style>
