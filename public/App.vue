@@ -45,11 +45,10 @@
     </div>
 </template>
 <script>
-    import TruffleContract from "truffle-contract";
-    import ToDo from "./ToDo";
+    import todo from "./ToDo";
     import contract from "../build/contracts/ToDoFactory.json";
 
-    const Dapp = {
+    window.Dapp = {
         contracts: {},
         web3Provider: undefined
     };
@@ -57,7 +56,7 @@
     export default {
         name: "app",
         components: {
-            ToDo
+            todo
         },
         data() {
             return {
@@ -74,7 +73,7 @@
         },
         methods: {
             add() {
-                Dapp.contracts.ToDoFactory
+                window.Dapp.contracts.ToDoFactory
                     .deployed()
                     .then(contract => contract.add((this.newTodo), {from: this.user}))
                     .then(id => {
@@ -87,6 +86,7 @@
         created() {
             const initApp = init.bind(this);
             initApp()
+            window.web3.currentProvider.publicConfigStore.on("update", initApp)//reload tasks on user change
         }
     };
 
@@ -98,30 +98,23 @@
                 .then(u => this.user = u))
             .then(() => initContract())
             .then(() => loadTodos.bind(this)())
-            .then(() => web3.currentProvider.publicConfigStore.on("update", init)) //reload tasks on user change
             .catch(e => this.error = e);
     }
 
     function loadTodos() {
         this.tasks = [];
-        return Dapp.contracts.ToDoFactory
+        return window.Dapp.contracts.ToDoFactory
             .deployed()
             .then(contract => contract
                 .getMyToDos.call()
-                .then(todos => {
+                .then(todos =>
                     todos.map(id =>
-                        contract.getById.call(web3.toDecimal(id))
-                            .then(toDo => {
-                                this.tasks.push(toDo);
-                            })
-                            .catch(e => {
-                                console.error(e);
-                            })
-                    );
-                    console.log(todos);
-                })
+                        contract.getById
+                            .call(window.web3.toDecimal(id))
+                            .then(toDo => this.tasks.push(toDo))
+                    )
+                )
             );
-
     }
 
     function checkUser() {
@@ -133,16 +126,18 @@
     function initWeb3() {
         return new Promise((resolve, reject) => {
             if (typeof window.web3 !== "undefined") {
-                Dapp.web3Provider = window.web3.currentProvider;
+                window.Dapp.web3Provider = window.web3.currentProvider;
             } else {
-                reject(new Error("no injected web3 instance is detected"));
+                return reject(new Error("no injected web3 instance is detected"));
             }
-            return resolve(new Web3(Dapp.web3Provider));
+            return resolve(new Web3(window.Dapp.web3Provider));
         });
     }
 
     function initContract() {
-        Dapp.contracts.ToDoFactory = TruffleContract(contract);
-        Dapp.contracts.ToDoFactory.setProvider(Dapp.web3Provider);
+        window.Dapp.contracts.ToDoFactory = window.TruffleContract(contract);
+        window.Dapp.contracts.ToDoFactory.setProvider(window.Dapp.web3Provider);
     }
 </script>
+<style scoped>
+</style>

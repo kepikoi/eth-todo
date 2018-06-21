@@ -7,14 +7,13 @@
     "bootstrap": "^4.1.1",
     "jquery": "^3.3.1",
     "popper.js": "^1.14.3",
-    "postcss-modules": "^1.1.0",
     "truffle-contract": "^3.0.6",
     "vue": "^2.5.16",
-    "vue-component-compiler": "^2.0.0",
-    "web3": "latest"
+    "vue-component-compiler": "^2.0.0"
   },
   "devDependencies": {
     "@vue/component-compiler-utils": "^2.0.0",
+    "postcss-modules": "^1.1.0",
     "node-sass": "^4.9.0",
     "parcel-bundler": "^1.9.2",
     "truffle": "^4.1.11",
@@ -23,7 +22,7 @@
   },
   "scripts": {
     "postinstall": "npm run build",
-    "build": "truffle compile && truffle migrate",
+    "build": ".\\node_modules\\.bin\\truffle.cmd compile && .\\node_modules\\.bin\\truffle.cmd migrate",
     "start": ".\\node_modules\\.bin\\parcel.cmd public/index.html",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
