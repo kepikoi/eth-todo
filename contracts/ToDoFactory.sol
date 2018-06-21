@@ -5,7 +5,6 @@ contract ToDoFactory {
     event ToDoAdded(uint id, string text);
 
     struct ToDo {
-        address user;
         string text;
         bool done;
     }
@@ -14,20 +13,31 @@ contract ToDoFactory {
     mapping(uint => address) todoOwner;
     mapping(address => uint) ownerTodoCount;
 
+    modifier ownerOf(uint _id) {
+        require(todoOwner[_id] == msg.sender);
+        _;
+    }
+
     function add(string _text) public {
-        uint id = todos.push(ToDo(msg.sender, _text, false)) - 1;
+        uint id = todos.push(ToDo(_text, false)) - 1;
         todoOwner[id] = msg.sender;
         ownerTodoCount[msg.sender]++;
     }
 
-    function complete(uint _id, bool _undo) public {
-        require(todos[_id].user == msg.sender);
+    function complete(uint _id, bool _undo) public ownerOf(_id) {
         if (_undo == true) {
             todos[_id].done = false;
         }
         else {
             todos[_id].done = true;
+            ownerTodoCount[msg.sender]--;
         }
+
+    }
+
+    function getById(uint id) public view returns (string){
+        ToDo memory todo = todos[id];
+        return todo.text;
     }
 
     function getMyToDos() public view returns (uint[]) {
@@ -36,7 +46,7 @@ contract ToDoFactory {
         for (uint i = 0; i < todos.length; i++) {
             ToDo memory current = todos[i];
 
-            if (current.user == msg.sender && current.done == false) {
+            if (todoOwner[i] == msg.sender && current.done == false) {
                 out[count] = i;
                 count++;
             }

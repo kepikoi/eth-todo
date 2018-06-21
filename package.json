@@ -4,16 +4,27 @@
   "description": "Another Blockchain ToDo App",
   "main": "index.js",
   "dependencies": {
-    "lite-server": "^2.3.0"
+    "bootstrap": "^4.1.1",
+    "jquery": "^3.3.1",
+    "popper.js": "^1.14.3",
+    "postcss-modules": "^1.1.0",
+    "truffle-contract": "^3.0.6",
+    "vue": "^2.5.16",
+    "vue-component-compiler": "^2.0.0",
+    "web3": "latest"
   },
   "devDependencies": {
+    "@vue/component-compiler-utils": "^2.0.0",
     "node-sass": "^4.9.0",
-    "truffle": "^4.1.11"
+    "parcel-bundler": "^1.9.2",
+    "truffle": "^4.1.11",
+    "vue-hot-reload-api": "^2.3.0",
+    "vue-template-compiler": "^2.5.16"
   },
   "scripts": {
-    "postinstall": "./npm-modules/.bin/truffle/truffle compile && ./npm-modules/.bin/truffle/truffle migrate",
-    "build": "node build.js",
-    "start": "lite-server",
+    "postinstall": "npm run build",
+    "build": "truffle compile && truffle migrate",
+    "start": ".\\node_modules\\.bin\\parcel.cmd public/index.html",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
