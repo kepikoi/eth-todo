@@ -1,11 +1,7 @@
 <template>
     <div class="container">
-        <div v-if="user" class="alert alert-success alert-dismissible fade show" role="alert">
-            <strong>Login successfull</strong> Logged in as {{user}}
-
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
+        <div ref="notifications">
+            <notification v-if="user" type="success"><strong>Login successfull</strong> Logged in as {{user}}</notification>
         </div>
         <div v-if="error">
             <div class="alert alert-danger" role="alert">
@@ -17,7 +13,7 @@
         </div>
         <div class="py-5 text-center">
             <h1> Eth To-Do</h1>
-            <p>Blockchain-based ToDo app</p>
+            <p>Another blockchain-based To-Do app</p>
         </div>
         <div v-if="user">
             <div class="row">
@@ -35,7 +31,7 @@
                     <br>
                     <todo v-for="task in tasks" :text="task.todo" :id="task.id" :tx="task.tx" v-on:error="onerror"></todo>
                     <spinner v-if="isLoadingTasks"></spinner>
-                    <div v-if="tasks.length === 0 && !isLoadingTasks">🤘🏻 All done!</div>
+                    <div id="alldone" v-if="tasks.length === 0 && !isLoadingTasks">🤘🏻 All done!</div>
                 </div>
             </div>
         </div>
@@ -47,29 +43,32 @@
     </div>
 </template>
 <script>
-    import todo from "./components/ToDo";
+    import Todo from "./components/ToDo";
     import Vue from "vue";
-    import spinner from "./components/Spinner";
+    import Spinner from "./components/Spinner";
+    import Notification from "./components/Notification";
 
     export default {
         name: "app",
         components: {
-            todo,
-            spinner
+            Todo,
+            Spinner,
+            Notification
         },
         data() {
             return {
                 error: undefined,
                 newTodo: undefined,
                 tasks: [],
-                isLoadingTasks: true
+                isLoadingTasks: true,
+                user: Vue.getUser()
             }
         },
-        computed: {
-            user() {
-                return Vue.getUser()
-            }
-        },
+        // computed: {
+        //     user() {
+        //         return Vue.getUser()
+        //     }
+        // },
         watch: {
             error(v) {
                 console.error(v);
@@ -92,25 +91,41 @@
         },
         created() {
             console.log("App.vue");
-            return Vue
-                .deployed()
-                .then(contract => contract
-                    .getMyToDos.call()
-                    .then(todos => {
-                            this.isLoadingTasks = false;
-                            todos.map(id => {
-                                    const dId = window.web3.toDecimal(id);
-                                    contract.getById
-                                        .call(dId)
-                                        .then(todo => this.tasks.push({id: dId, todo}))
-                                }
-                            )
-                        }
-                    )
-                );
+            const initApp = loadTasks.bind(this);
+            web3.currentProvider.publicConfigStore.on("update", data => {
+                //reload tasks on user change
+                if (data.selectedAddress !== this.user) {
+                    this.user = Vue.getUser(); //reset user
+                    const notiComponent = Vue.extend(Notification);
+                    const notiInstance = new notiComponent({propsData: {type: "warning"}});
+                    notiInstance.$slots.default = "Current user changed: Logged in as " + this.user;
+                    notiInstance.$mount();
+                    this.$refs.notifications.appendChild(notiInstance.$el);
+                    return initApp();
+                }
+            });
+            initApp()
         }
     };
 
+    function loadTasks() {
+        this.tasks = []; //empty tasks
+        return Vue
+            .deployed()
+            .then(contract => contract
+                .getMyToDos.call()
+                .then(todos => {
+                        this.isLoadingTasks = false; //stop spinner
+                        todos.map(id => {
+                            const dId = window.web3.toDecimal(id);
+                            contract.getById
+                                .call(dId)
+                                .then(todo => this.tasks.push({id: dId, todo})) //add tasks to list
+                        })
+                    }
+                )
+            );
+    }
 
 </script>
 <style scoped>

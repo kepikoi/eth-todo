@@ -23,6 +23,5 @@ export default {
         };
         Vue.getUser = () => window.web3.eth.accounts[0];
         Vue.deployed = () => Vue.Dapp.contracts[options.name].deployed();
-        //Vue.filter = address => new Promise((resolve, reject) => window.web3.eth.filter({address}).get((err, results) => err ? reject(err) : resolve(results)));
     }
 };

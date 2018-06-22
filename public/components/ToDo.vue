@@ -1,11 +1,11 @@
 <template>
     <div :class="{done : isDone}">
-        <div class="input-group mb-1" :class="[id&&tx?'add-confirm':'add-transit']">
+        <div class="input-group mb-1" :class="[tid&&tx?'add-confirm':'add-transit']">
             <spinner v-if="transitional"></spinner>
             <input type="text" class="form-control" placeholder="ToDo" aria-label="ToDo" v-model="text" readonly>
             <div class="input-group-append">
-                <button v-if="isDone" type="button" @click="complete(true)" class="btn btn-light">Undo</button>
-                <button v-else :disabled="transitional" type="button" @click="complete(false)" class="btn btn-dark">Done</button>
+                <button v-if="isDone" type="button" @click="complete(true)" class="btn btn-light undo-btn">Undo</button>
+                <button v-else :disabled="transitional" type="button" @click="complete(false)" class="btn btn-dark done-btn">Done</button>
             </div>
         </div>
     </div>
@@ -24,16 +24,14 @@
         data() {
             return {
                 isDone: false,
-                isModified: false
+                isModified: false,
+                tid: this.id //avoid manipulating prop
             };
         },
         computed: {
-            // _tx() {
-            //     return this.tx || null
-            // },
             transitional() {
                 //task is transitional when it has no id or was flagged as isModified
-                return typeof this.id !== "number" || this.isModified;
+                return typeof this.tid !== "number" || this.isModified;
             }
         },
         methods: {
@@ -45,14 +43,12 @@
             complete(undo) {
                 return Vue.deployed()
                     .then(contract => {
-
                         //store tx number and listen for block confirmation
                         contract
-                            .complete(this.id, undo)
+                            .complete(this.tid, undo)
                             .then(receipt => {
                                 this.isModified = true;
                                 return receipt.tx;
-
                             })
                             .then(tx => contract
                                 .TaskModified({}, {sender: tx})
@@ -60,7 +56,7 @@
                                     if (err) {
                                         return this.$emit('error', err);
                                     }
-                                    this.isDone = !undo
+                                    this.isDone = !undo;
                                     this.isModified = false;
                                 })
                             )
@@ -72,12 +68,11 @@
         },
         created() {
             if (this.tx) {
-
                 //we're not getting the id for newly created tasks from ethereum, since the block is not yet written, so we need to listen
                 // to a specific event which will transmit the id
                 Vue.deployed()
                     .then(contract => {
-                        console.log("watch",this.tx)
+                        console.log("watch",this.tx);
                             const added = contract
                                 .TaskAdded({}, {sender: this.tx});
 
@@ -86,7 +81,7 @@
                                 if (err) {
                                     return this.$emit('error', err);
                                 }
-                                this.id = window.web3.toDecimal(result.args.id);
+                                this.tid = window.web3.toDecimal(result.args.id);
                             })
                         }
                     );

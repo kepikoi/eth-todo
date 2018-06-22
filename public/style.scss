@@ -4,7 +4,7 @@
   transition: 2s;
 
   .form-control[readonly] {
-    background-color: #f8f9fa;
+    background-color: $gray-100;
   }
 
   input {
@@ -27,9 +27,17 @@
   }
 
   .add-confirm input {
-    animation-duration: 2s;
+    animation-duration: 1s;
     animation-name: addconfirm;
     animation-iteration-count: 1;
+    animation-timing-function: ease-out;
+  }
+
+  #alldone{
+    animation-duration: 2s;
+    animation-name: addtransit;
+    animation-iteration-count: 1;
+    animation-timing-function: ease-in;
   }
 }
 

@@ -7,9 +7,13 @@ Vue.use(W3Plug, {contract, name: "ToDoFactory"});
 Vue
     .initWeb3()
     .then(Vue.initContract)
-    .then(() =>  {
-       new Vue({
-           el: "#app",
-           render: h => h(App),
-       });
-   });
+    .catch(e => e)
+    .then(e => {
+        new Vue({
+            el: "#app",
+            render: h => h(App),
+            data: {
+                globalError: e
+            }
+        });
+    });
