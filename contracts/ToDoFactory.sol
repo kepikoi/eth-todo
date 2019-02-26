@@ -1,6 +1,7 @@
 pragma solidity ^0.4.17;
+import "./Dummy.sol";
 
-contract ToDoFactory {
+contract ToDoFactory is Dummy{
 
     event ToDoAdded(uint id, string text);
 
@@ -10,7 +11,7 @@ contract ToDoFactory {
     }
 
     ToDo[] todos;
-    mapping(uint => address) todoOwner;
+    mapping(uint => address) public todoOwner;
     mapping(address => uint) ownerTodoCount;
 
     modifier ownerOf(uint _id) {
