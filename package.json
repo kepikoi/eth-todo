@@ -1,7 +1,7 @@
 {
   "name": "eth-todo",
   "version": "0.0.1",
-  "description": "Another Blockchain ToDo App",
+  "description": "Sample Ethereum based ToDo App",
   "main": "index.js",
   "dependencies": {
     "bootstrap": "^4.1.1",
@@ -21,9 +21,9 @@
     "vue-template-compiler": "^2.5.16"
   },
   "scripts": {
-    "postinstall": "npm run build",
-    "build": ".\\node_modules\\.bin\\truffle.cmd compile && .\\node_modules\\.bin\\truffle.cmd migrate",
-    "start": ".\\node_modules\\.bin\\parcel.cmd public/index.html"
+    "postinstall": "npm run build && npm run start",
+    "build": "truffle compile && truffle migrate",
+    "start": "parcel public/index.html"
   },
   "author": "",
   "license": "ISC"
