@@ -37,7 +37,7 @@
         </div>
         <div v-else>
             <div class="alert alert-info" role="alert">
-                Please login to Metamask
+                Please login to MetaMask
             </div>
         </div>
     </div>
@@ -64,11 +64,6 @@
                 user: Vue.getUser()
             }
         },
-        // computed: {
-        //     user() {
-        //         return Vue.getUser()
-        //     }
-        // },
         watch: {
             error(v) {
                 console.error(v);
@@ -89,7 +84,7 @@
                 this.error = e;
             }
         },
-        created() {
+        mounted() {
             console.log("App.vue");
             const initApp = loadTasks.bind(this);
             web3.currentProvider.publicConfigStore.on("update", data => {
