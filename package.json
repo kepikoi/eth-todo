@@ -13,9 +13,9 @@
   },
   "devDependencies": {
     "@vue/component-compiler-utils": "^2.0.0",
-    "postcss-modules": "^1.1.0",
+    "postcss-modules": "^1.5.0",
     "node-sass": "^4.9.0",
-    "parcel-bundler": "^1.9.2",
+    "parcel-bundler": "^1.12.5",
     "truffle": "^4.1.11",
     "vue-hot-reload-api": "^2.3.0",
     "vue-template-compiler": "^2.5.16"
